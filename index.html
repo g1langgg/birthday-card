@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>HBD Sayang</title>
+</head>
+
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h2>🎂 Birthday Verification</h2>
+            <p>Masukkan tanggal lahir untuk melihat surprise!</p>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="birthdate">Tanggal Lahir:</label>
+                    <input type="date" id="birthdate" required>
+                </div>
+                <button type="submit">Masuk 🎉</button>
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Birthday Card (Hidden initially) -->
+    <div id="cardScreen" class="card-container" style="display: none;">
+        <button id="bgmToggle" class="bgm-toggle" style="display:none">🔇 Music</button>
+        <!-- Open Card Button -->
+        <button id="openCard" class="bgm-toggle" style="display:none; right: 120px; position: fixed;">📖 Open Card</button>
+        <button id="chooseMusic" class="bgm-toggle" style="display:none; right: 260px; position: fixed;">🎵 Choose Music</button>
+        <input id="musicFile" type="file" accept="audio/*" style="display:none" />
+        <div class="card">
+        <div class="imgBox">
+            <div class="bark"></div>
+            
+            <img src="couple-photo.jpg/WhatsApp Image 2025-09-26 at 11.01.12.jpeg" alt="Cover Photo" class="cover-photo">
+            
+            <!-- Simple Bottom Text -->
+            <div class="cover-text">
+                <h3>Kung Fu Birthday! 🐼🥋</h3>
+            </div>
+            
+            <!-- Decorations around the edges only -->
+            <div class="edge-decorations">
+                <div class="corner-sparkle top-left">✨</div>
+                <div class="corner-sparkle top-right">⭐</div>
+                <div class="corner-sparkle bottom-left">💫</div>
+                <div class="corner-sparkle bottom-right">🌟</div>
+            </div>
+        </div>
+            <div class="details">
+                <div class="romantic-bg">
+                    <div class="heart heart1">💖</div>
+                    <div class="heart heart2">💕</div>
+                    <div class="heart heart3">💗</div>
+                    <div class="heart heart4">💝</div>
+                    <div class="heart heart5">💘</div>
+                </div>
+                
+                <!-- Animated Kung Fu elements when card is opened -->
+                <div class="kung-fu-animations">
+                    <div class="bouncing-panda">🐼</div>
+                    <div class="spinning-karate">🥋</div>
+                    <div class="jumping-lightning">⚡</div>
+                    <div class="floating-star">🌟</div>
+                    <div class="bouncing-panda2">🐼</div>
+                    <div class="spinning-karate2">🥋</div>
+                </div>
+                
+                <!-- headings removed for more space -->
+                
+                <div class="romantic-message">
+					<p class="love-line">HBD partner-in-crime (level 9999 🚀✨)</p>
+					<p class="love-line">Hope u get all the good vibes, more wins, and zero L’s this year 🔥</p>
+					<p class="love-line">Thanks for always being around, u’re kinda my daily energy boost fr 🤭</p>
+					<p class="love-line final">Let’s keep leveling up together, it hits different with u 💯</p>
+				</div>
+                
+                <div class="romantic-footer">
+                    <span class="love-symbol">💌</span>
+                    <span class="love-text">Forever Yours</span>
+                    <span class="love-symbol">💌</span>
+                    <span class="love-text" id="signature" style="margin-left:10px;color:#6b7280;">— from me to you</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgm" preload="auto" loop playsinline>
+        <source src="my-kind-of-woman.mp3.mp3" type="audio/mpeg">
+        <source src="my-kind-of-woman.m4a" type="audio/mp4">
+        <source src="my-kind-of-woman.ogg" type="audio/ogg">
+    </audio>
+    <div id="audioToast" class="audio-toast">Audio error. Coba klik tombol Music atau cek file.</div>
+
+    <script>
+        function launchConfetti() {
+            const durationMs = 1200;
+            const endTime = Date.now() + durationMs;
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed';
+            canvas.style.inset = '0';
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.pointerEvents = 'none';
+            canvas.style.zIndex = '9999';
+            document.body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+            resize();
+            window.addEventListener('resize', resize);
+
+            const particleCount = 120;
+            const colors = ['#f87171','#fb923c','#fbbf24','#34d399','#60a5fa','#a78bfa','#f472b6'];
+            const particles = Array.from({ length: particleCount }).map(() => ({
+                x: Math.random() * canvas.width,
+                y: -20 - Math.random() * canvas.height * 0.3,
+                r: 3 + Math.random() * 4,
+                vx: -2 + Math.random() * 4,
+                vy: 2 + Math.random() * 3,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: Math.random() * Math.PI,
+                vr: -0.1 + Math.random() * 0.2
+            }));
+
+            function frame() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.05;
+                    p.rotation += p.vr;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.r, -p.r, p.r * 2, p.r * 2);
+                    ctx.restore();
+                });
+                if (Date.now() < endTime) {
+                    requestAnimationFrame(frame);
+                } else {
+                    document.body.removeChild(canvas);
+                    window.removeEventListener('resize', resize);
+                }
+            }
+            requestAnimationFrame(frame);
+        }
+
+        function showAudioToast(msg) {
+            const el = document.getElementById('audioToast');
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+            clearTimeout(showAudioToast._t);
+            showAudioToast._t = setTimeout(() => { el.style.display = 'none'; }, 3000);
+        }
+
+        function fadeInAudio(audio, targetVolume, durationMs) {
+            if (!audio) return;
+            const target = Math.max(0, Math.min(1, targetVolume ?? 0.6));
+            const duration = durationMs ?? 1500;
+            const start = performance.now();
+            audio.volume = 0;
+            audio.muted = false;
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => { showAudioToast('Audio diblokir. Klik Music untuk mulai.'); });
+            }
+            function step(now) {
+                const t = Math.min(1, (now - start) / duration);
+                audio.volume = t * target;
+                if (t < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // 3D tilt interaction
+        (function setupTilt(){
+            const card = document.querySelector('.card');
+            const container = document.getElementById('cardScreen');
+            if (!card || !container) return;
+            let hoveringCard = false;
+            card.addEventListener('mouseenter', () => { hoveringCard = true; card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg'); });
+            card.addEventListener('mouseleave', () => { hoveringCard = false; });
+            container.addEventListener('mousemove', (e) => {
+                if (hoveringCard) return;
+                const rect = card.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = (e.clientX - cx) / rect.width;   // -0.5 .. 0.5
+                const dy = (e.clientY - cy) / rect.height;  // -0.5 .. 0.5
+                const maxTilt = 8; // degrees
+                const ry = (-dx * maxTilt).toFixed(2) + 'deg';
+                const rx = (dy * maxTilt).toFixed(2) + 'deg';
+                card.style.setProperty('--rx', rx);
+                card.style.setProperty('--ry', ry);
+            });
+            container.addEventListener('mouseleave', () => {
+                card.style.setProperty('--rx','0deg');
+                card.style.setProperty('--ry','0deg');
+            });
+        })();
+
+        // Open Card + Typewriter
+        (function setupOpenAndTypewriter(){
+            const card = document.querySelector('.card');
+            const openBtn = document.getElementById('openCard');
+            const lines = Array.from(document.querySelectorAll('.romantic-message .love-line'));
+            if (!card || !openBtn || !lines.length) return;
+            let opened = false;
+            let hasTyped = false;
+            openBtn.addEventListener('click', () => {
+                if (!opened) {
+                    card.classList.add('opened');
+                    opened = true;
+                    openBtn.textContent = '📕 Close Card';
+                    if (!hasTyped) {
+                        // typewriter all lines sequentially
+                        let idx = 0;
+                        const originals = lines.map(el => el.textContent);
+                        lines.forEach(el => el.textContent = '');
+                        const speed = 28;
+                        function typeNext() {
+                            if (idx >= lines.length) { hasTyped = true; return; }
+                            const el = lines[idx];
+                            const text = originals[idx];
+                            let i = 0;
+                            const timer = setInterval(() => {
+                                el.textContent = text.slice(0, i++);
+                                if (i > text.length) { clearInterval(timer); idx++; setTimeout(typeNext, 120); }
+                            }, speed);
+                        }
+                        typeNext();
+                    }
+                } else {
+                    card.classList.remove('opened');
+                    opened = false;
+                    openBtn.textContent = '📖 Open Card';
+                }
+            });
+        })();
+
+        // Background music controls + file picker
+        (function setupBgm(){
+            const audio = document.getElementById('bgm');
+            const toggle = document.getElementById('bgmToggle');
+            const chooseBtn = document.getElementById('chooseMusic');
+            const fileInput = document.getElementById('musicFile');
+            if (!audio || !toggle || !chooseBtn || !fileInput) return;
+            function updateIcon(){ toggle.textContent = audio.muted || audio.paused ? '🔇 Music' : '🔊 Music'; }
+
+            audio.addEventListener('error', () => {
+                const code = audio.error && audio.error.code;
+                const map = {1:'aborted',2:'network',3:'decode',4:'src not supported'};
+                showAudioToast('Gagal memuat audio (' + (map[code]||'unknown') + ').');
+            });
+            audio.addEventListener('stalled', () => showAudioToast('Audio tersendat. Coba tunggu/refresh.'));
+
+            ['play','pause','volumechange','ended','loadeddata','timeupdate'].forEach(ev => audio.addEventListener(ev, updateIcon));
+
+            const startPlayback = () => {
+                audio.muted = false;
+                if (audio.volume === 0) { audio.volume = 0.8; }
+                const p = audio.play();
+                if (p && typeof p.then === 'function') {
+                    p.then(() => {
+                        showAudioToast('Playing… volume ' + Math.round(audio.volume*100) + '%');
+                    }).catch(() => {
+                        showAudioToast('Tidak bisa memutar. Coba klik lagi.');
+                    });
+                }
+            };
+
+            const handleToggle = () => {
+                if (audio.paused || audio.ended) {
+                    startPlayback();
+                } else {
+                    // if playing but muted or very low volume, unmute and raise volume
+                    if (audio.muted || audio.volume < 0.05) {
+                        audio.muted = false;
+                        audio.volume = Math.max(audio.volume, 0.7);
+                        showAudioToast('Unmute. Volume ' + Math.round(audio.volume*100) + '%');
+                    } else {
+                        audio.muted = true;
+                        showAudioToast('Muted');
+                    }
+                }
+                updateIcon();
+            };
+            toggle.addEventListener('click', handleToggle);
+
+            chooseBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files && fileInput.files[0];
+                if (!file) return;
+                try {
+                    const url = URL.createObjectURL(file);
+                    audio.pause();
+                    audio.src = url;
+                    audio.load();
+                    audio.volume = 0.8;
+                    startPlayback();
+                    updateIcon();
+                    showAudioToast('Memutar: ' + (file.name || 'audio')); 
+                } catch (e) {
+                    showAudioToast('Gagal memuat file terpilih.');
+                }
+            });
+            updateIcon();
+        })();
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const birthdate = document.getElementById('birthdate').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const loginScreen = document.getElementById('loginScreen');
+            const cardScreen = document.getElementById('cardScreen');
+            const bgm = document.getElementById('bgm');
+            const bgmToggle = document.getElementById('bgmToggle');
+            const chooseMusic = document.getElementById('chooseMusic');
+
+            if (birthdate === '2010-10-01') {
+                if (bgm) { fadeInAudio(bgm, 0.6, 800); }
+
+                errorMessage.style.display = 'none';
+                loginScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                    cardScreen.style.display = 'block';
+                    cardScreen.classList.add('fade-in');
+                    cardScreen.classList.add('show-message');
+                    bgmToggle.style.display = 'inline-flex';
+                    document.getElementById('openCard').style.display = 'inline-flex';
+                    // keep choose button hidden for sharing build
+                    // chooseMusic.style.display = 'inline-flex';
+
+                    if (bgm && bgm.paused) {
+                        const onceStart = () => {
+                            bgm.muted = false;
+                            bgm.volume = Math.max(bgm.volume, 0.6);
+                            bgm.play().catch(()=>{});
+                            document.removeEventListener('click', onceStart, { capture: true });
+                            document.removeEventListener('touchstart', onceStart, { capture: true });
+                        };
+                        document.addEventListener('click', onceStart, { capture: true, once: true });
+                        document.addEventListener('touchstart', onceStart, { capture: true, once: true });
+                    }
+
+                    launchConfetti();
+                }, 600);
+            } else {
+                errorMessage.textContent = 'Tanggal lahir salah! Coba lagi 😊';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
